@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_DEPRECATED);
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,4 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+->withExceptions(function (Exceptions $exceptions) {
+    $exceptions->dontReport([
+        \Symfony\Component\ErrorHandler\Error\DeprecatedError::class,
+    ]);
+})
+
+->create();
