@@ -1,23 +1,22 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\SubmissionController;
-use App\Http\Controllers\AdministrativeVerificationController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\FinalDecisionController;
-use App\Http\Controllers\SubmissionRevisionController;
-use App\Http\Controllers\ReviewAssignmentController;
-
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return app(DashboardController::class)->index();
+    }
+    return view('dashboard-guest');
+})->name('dashboard');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard.authenticated');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resources([
-    'submissions' => SubmissionController::class,
-    'administrative-verifications' => AdministrativeVerificationController::class,
-    'reviews' => ReviewController::class,
-    'final-decisions' => FinalDecisionController::class,
-    'submission-revisions' => SubmissionRevisionController::class,
-    'review-assignments' => ReviewAssignmentController::class,
-]);
+require __DIR__.'/auth.php';
